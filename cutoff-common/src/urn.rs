@@ -4,6 +4,7 @@ use std::str::FromStr;
 use derive_builder::Builder;
 use once_cell::sync::Lazy;
 use regex::Regex;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use thiserror::Error;
 use url::Url;
 
@@ -79,6 +80,20 @@ impl Display for Urn {
             write!(f, "#{}", fragment)?;
         }
         Ok(())
+    }
+}
+
+impl Serialize for Urn {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+        serializer.serialize_str(&self.to_string())
+    }
+}
+
+impl<'de> Deserialize<'de> for Urn {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de> {
+        let s = String::deserialize(deserializer)?;
+        Urn::from_str(&s)
+            .map_err(serde::de::Error::custom)
     }
 }
 
