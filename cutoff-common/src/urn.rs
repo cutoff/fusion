@@ -1,4 +1,5 @@
 use std::fmt::{Display, Formatter};
+use std::ops::Deref;
 use std::str::FromStr;
 
 use derive_builder::Builder;
