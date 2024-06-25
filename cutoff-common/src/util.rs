@@ -7,7 +7,7 @@ pub mod io_util;
 pub fn init_logging() {
     tracing_subscriber::fmt()
         .compact()
-        .with_max_level(tracing::Level::DEBUG)
+        .with_max_level(tracing::Level::TRACE)
         // .without_time()
         // disable printing the name of the module in every log line.
         .with_target(false)
