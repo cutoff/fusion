@@ -1,7 +1,10 @@
 //! Standard features extensions
 
 use std::collections::HashSet;
+use std::fmt::Display;
 use std::hash::Hash;
+
+use log::log;
 
 pub mod vecmap;
 
@@ -46,3 +49,35 @@ mod tests {
         );
     }
 }*/
+
+pub trait LogAndNone<T> {
+    fn ok_or_log(self, level: log::Level) -> Option<T>;
+}
+
+impl<T, E> LogAndNone<T> for Result<T, E>
+where
+    E: Display
+{
+    /// Converts `self` into an [`Option<T>`], consuming `self`,
+    /// and log the error, if any, in level `level`.
+    ///
+    /// # Examples
+    ///
+    /// ```ignore
+    /// # use log::Level;
+    /// let x: Result<u32, &str> = Ok(2);
+    /// assert_eq!(x.ok_or_log(Level::Info), Some(2));
+    ///
+    /// let x: Result<u32, &str> = Err("Nothing here");
+    /// assert_eq!(x.ok_or_log(Level::Info), None); // log "Nothing Here" in Info level 
+    /// ```
+    fn ok_or_log(self, level: log::Level) -> Option<T> {
+        match self {
+            Ok(value) => Some(value),
+            Err(err) => {
+                log!(level, "{}", err);
+                None
+            },
+        }
+    }
+}
