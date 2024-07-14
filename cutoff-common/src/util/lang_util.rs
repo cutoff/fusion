@@ -7,6 +7,7 @@ use std::hash::Hash;
 use log::log;
 
 pub mod vecmap;
+pub mod prealloc_vec;
 
 pub enum DiffItem<T> {
     Same(T),
