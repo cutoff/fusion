@@ -105,11 +105,10 @@ where
     pub fn last(&self) -> Option<&T> {
         unsafe {
             let state = &mut *self.state.get();
-            let len = state.items.len();
-            if len == 0 {
+            if state.back_index == 0 {
                 None
             } else {
-                state.items.get(len - 1)
+                state.items.get(state.back_index - 1)
             }
         }
     }
@@ -117,21 +116,22 @@ where
     pub fn last_mut(&self) -> Option<&mut T> {
         unsafe {
             let state = &mut *self.state.get();
-            let len = state.items.len();
-            if len == 0 {
+            if state.back_index == 0 {
                 None
             } else {
-                state.items.get_mut(len - 1)
+                state.items.get_mut(state.back_index - 1)
             }
         }
     }
     
     pub fn last_index(&self) -> Option<usize> {
-        let len = self.len();
-        if len == 0 {
-            None
-        } else {
-            Some(len - 1)
+        unsafe {
+            let state = &mut *self.state.get();
+            if state.back_index == 0 {
+                None
+            } else {
+                Some(state.back_index - 1)
+            }
         }
     }
 
