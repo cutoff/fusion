@@ -1,4 +1,4 @@
-//! Pre-allocated, &self only, non-locking Vector
+//! &self only, non-locking Vector of pre-allocated elements T not implementing Default 🙄
 
 use std::cell::UnsafeCell;
 use std::fmt::{Debug, Formatter};
@@ -65,6 +65,10 @@ where
             state.items.as_slice()
         }
     }
+    
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
 
     pub fn len(&self) -> usize {
         unsafe {
@@ -123,7 +127,7 @@ where
             }
         }
     }
-    
+
     pub fn last_index(&self) -> Option<usize> {
         unsafe {
             let state = &mut *self.state.get();
@@ -171,7 +175,7 @@ where
             state.back_index += 1;
         }
     }
-    
+
     // TODO iter, enumerate
 }
 
