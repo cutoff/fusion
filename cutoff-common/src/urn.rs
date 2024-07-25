@@ -1,14 +1,14 @@
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
+use std::sync::LazyLock;
 
 use derive_builder::Builder;
-use once_cell::sync::Lazy;
 use regex::Regex;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use thiserror::Error;
 use url::Url;
 
-static URN_PATTERN: Lazy<Regex> = Lazy::new(|| {
+static URN_PATTERN: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"^([A-Za-z0-9\-._]+):([A-Za-z0-9.\-_:]+)(?:/([A-Za-z0-9/\-]*))?$")
         .expect("Cannot compile the URN regular expression")
 });
