@@ -82,3 +82,7 @@ where
         }
     }
 }
+
+pub trait MaybeFrom<T> {
+    fn maybe_from(value: T) -> Option<Self> where Self: Sized;
+}
