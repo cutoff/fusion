@@ -1,10 +1,9 @@
 //! Standard features extensions
 
+use log::log;
 use std::collections::HashSet;
 use std::fmt::Display;
 use std::hash::Hash;
-
-use log::log;
 
 pub mod vecmap;
 
@@ -50,11 +49,11 @@ mod tests {
     }
 }*/
 
-pub trait LogAndNone<T> {
+pub trait OkOrLog<T> {
     fn ok_or_log(self, level: log::Level) -> Option<T>;
 }
 
-impl<T, E> LogAndNone<T> for Result<T, E>
+impl<T, E> OkOrLog<T> for Result<T, E>
 where
     E: Display
 {
