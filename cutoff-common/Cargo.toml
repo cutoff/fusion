@@ -6,12 +6,12 @@ authors = [ "mail@renauddenis.com" ]
 
 [features]
 serde = ["dep:serde"]
+tracing-subscriber = ["dep:tracing-subscriber"]
 
 [dependencies]
 thiserror = "1.0.61"
-log = "0.4.21"
 tracing = "0.1.40"
-tracing-subscriber = "0.3.18"
+tracing-subscriber = { version = "0.3.18", optional = true }
 
 regex = "1.10.4"
 url = "2.5.0"

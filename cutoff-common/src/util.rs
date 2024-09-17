@@ -3,6 +3,7 @@ pub mod lang_util;
 pub mod io_util;
 
 /// Just a common way of initializing the logging infrastructure
+#[cfg(feature = "tracing-subscriber")]
 pub fn init_logging(max_level: tracing::Level) {
     tracing_subscriber::fmt()
         .compact()

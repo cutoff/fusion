@@ -1,9 +1,9 @@
 //! Standard features extensions
 
-use log::log;
 use std::collections::HashSet;
 use std::fmt::Display;
 use std::hash::Hash;
+use tracing::{event, Level};
 
 pub mod vecmap;
 
@@ -50,7 +50,7 @@ mod tests {
 }*/
 
 pub trait OkOrLog<T> {
-    fn ok_or_log(self, level: log::Level) -> Option<T>;
+    fn ok_or_log(self, level: tracing::Level) -> Option<T>;
 }
 
 impl<T, E> OkOrLog<T> for Result<T, E>
@@ -70,11 +70,17 @@ where
     /// let x: Result<u32, &str> = Err("Nothing here");
     /// assert_eq!(x.ok_or_log(Level::Info), None); // log "Nothing Here" in Info level 
     /// ```
-    fn ok_or_log(self, level: log::Level) -> Option<T> {
+    fn ok_or_log(self, level: Level) -> Option<T> {
         match self {
             Ok(value) => Some(value),
             Err(err) => {
-                log!(level, "{}", err);
+                match level {
+                    Level::TRACE => event!(Level::TRACE, "{}", err),
+                    Level::DEBUG => event!(Level::DEBUG, "{}", err),
+                    Level::INFO => event!(Level::INFO, "{}", err),
+                    Level::WARN => event!(Level::WARN, "{}", err),
+                    Level::ERROR => event!(Level::ERROR, "{}", err),
+                }
                 None
             },
         }
