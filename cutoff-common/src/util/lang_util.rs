@@ -3,6 +3,8 @@
 use std::collections::HashSet;
 use std::fmt::Display;
 use std::hash::Hash;
+use std::thread;
+use std::thread::JoinHandle;
 use tracing::{event, Level};
 
 pub mod vecmap;
@@ -55,7 +57,7 @@ pub trait OkOrLog<T> {
 
 impl<T, E> OkOrLog<T> for Result<T, E>
 where
-    E: Display
+    E: Display,
 {
     /// Converts `self` into an [`Option<T>`], consuming `self`,
     /// and log the error, if any, in level `level`.
@@ -82,11 +84,23 @@ where
                     Level::ERROR => event!(Level::ERROR, "{}", err),
                 }
                 None
-            },
+            }
         }
     }
 }
 
 pub trait MaybeFrom<T> {
-    fn maybe_from(value: T) -> Option<Self> where Self: Sized;
+    fn maybe_from(value: T) -> Option<Self>
+    where
+        Self: Sized;
+}
+
+/// Shortcut function for `thread::Builder::new().name(name.into()).spawn(f).unwrap()`.
+pub fn thread_spawn<F, T>(name: &str, f: F) -> JoinHandle<T>
+where
+    F: FnOnce() -> T,
+    F: Send + 'static,
+    T: Send + 'static,
+{
+    thread::Builder::new().name(name.into()).spawn(f).unwrap()
 }
