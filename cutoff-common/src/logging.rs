@@ -1,13 +1,5 @@
-//! Standard features extensions
-
 use std::fmt::Display;
-use std::thread;
-use std::thread::JoinHandle;
 use tracing::{event, Level};
-
-pub mod vecmap;
-pub mod more_hashset;
-pub mod more_range;
 
 pub trait OkOrLog<T> {
     fn ok_or_log(self, level: tracing::Level) -> Option<T>;
@@ -47,18 +39,18 @@ where
     }
 }
 
-pub trait MaybeFrom<T> {
-    fn maybe_from(value: T) -> Option<Self>
-    where
-        Self: Sized;
-}
-
-/// Shortcut function for `thread::Builder::new().name(name.into()).spawn(f).unwrap()`.
-pub fn thread_spawn<F, T>(name: &str, f: F) -> JoinHandle<T>
-where
-    F: FnOnce() -> T,
-    F: Send + 'static,
-    T: Send + 'static,
-{
-    thread::Builder::new().name(name.into()).spawn(f).unwrap()
+/// Just a common way of initializing the logging infrastructure
+#[cfg(feature = "tracing-subscriber")]
+pub fn init_logging(max_level: tracing::Level) {
+    tracing_subscriber::fmt()
+        .compact()
+        .with_max_level(max_level)
+        // .without_time()
+        // disable printing the name of the module in every log line.
+        .with_target(true)
+        .with_thread_names(true)
+        .with_thread_ids(false)
+        // disabling coloring, which won't work well in non-display logs
+        // .with_ansi(false)
+        .init();
 }
