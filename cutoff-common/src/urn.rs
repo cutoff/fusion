@@ -4,7 +4,6 @@ use std::sync::LazyLock;
 
 use derive_builder::Builder;
 use regex::Regex;
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use thiserror::Error;
 use url::Url;
 
@@ -83,20 +82,6 @@ impl Display for Urn {
     }
 }
 
-impl Serialize for Urn {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
-        serializer.serialize_str(&self.to_string())
-    }
-}
-
-impl<'de> Deserialize<'de> for Urn {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de> {
-        let s = String::deserialize(deserializer)?;
-        Urn::from_str(&s)
-            .map_err(serde::de::Error::custom)
-    }
-}
-
 #[derive(Error, Debug)]
 pub enum UrnFormatError {
     #[error("Invalid URN: URN scheme expected, but not found")]
@@ -104,6 +89,27 @@ pub enum UrnFormatError {
 
     #[error("Invalid URN: unrecognizable URN format")]
     InvalidUrn,
+}
+
+#[cfg(feature = "serde")]
+mod serde {
+    use crate::urn::Urn;
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
+    use std::str::FromStr;
+
+    impl Serialize for Urn {
+        fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+            serializer.serialize_str(&self.to_string())
+        }
+    }
+
+    impl<'de> Deserialize<'de> for Urn {
+        fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de> {
+            let s = String::deserialize(deserializer)?;
+            Urn::from_str(&s)
+                .map_err(serde::de::Error::custom)
+        }
+    }
 }
 
 #[cfg(test)]
