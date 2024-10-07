@@ -3,6 +3,7 @@ name = "common-rs"
 version = "1.0.0"
 edition = "2021"
 authors = [ "mail@renauddenis.com" ]
+publish = false
 
 [features]
 serde = ["dep:serde"]
