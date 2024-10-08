@@ -1,6 +1,8 @@
 pub mod urn;
 pub mod collections;
 pub mod io;
+
+#[cfg(feature = "tracing-subscriber")]
 pub mod logging;
 
 use std::thread;

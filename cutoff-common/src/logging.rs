@@ -2,7 +2,7 @@ use std::fmt::Display;
 use tracing::{event, Level};
 
 pub trait OkOrLog<T> {
-    fn ok_or_log(self, level: tracing::Level) -> Option<T>;
+    fn ok_or_log(self, level: Level) -> Option<T>;
 }
 
 impl<T, E> OkOrLog<T> for Result<T, E>
@@ -40,8 +40,7 @@ where
 }
 
 /// Just a common way of initializing the logging infrastructure
-#[cfg(feature = "tracing-subscriber")]
-pub fn init_logging(max_level: tracing::Level) {
+pub fn init_logging(max_level: Level) {
     tracing_subscriber::fmt()
         .compact()
         .with_max_level(max_level)
