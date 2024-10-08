@@ -1,7 +1,10 @@
 use std::fmt::Display;
 use tracing::{event, Level};
 
+/// A trait for converting a `Result` into an `Option` while logging any errors.
 pub trait OkOrLog<T> {
+    /// Converts `self` into an `Option<T>`, consuming `self`,
+    /// and logs the error, if any, at the specified log level.
     fn ok_or_log(self, level: Level) -> Option<T>;
 }
 
@@ -9,8 +12,8 @@ impl<T, E> OkOrLog<T> for Result<T, E>
 where
     E: Display,
 {
-    /// Converts `self` into an [`Option<T>`], consuming `self`,
-    /// and log the error, if any, in level `level`.
+    /// Converts `self` into an `Option<T>`, consuming `self`,
+    /// and logs the error, if any, at the specified log level.
     ///
     /// # Examples
     ///
@@ -20,12 +23,13 @@ where
     /// assert_eq!(x.ok_or_log(Level::Info), Some(2));
     ///
     /// let x: Result<u32, &str> = Err("Nothing here");
-    /// assert_eq!(x.ok_or_log(Level::Info), None); // log "Nothing Here" in Info level 
+    /// assert_eq!(x.ok_or_log(Level::Info), None); // logs "Nothing Here" at Info level 
     /// ```
     fn ok_or_log(self, level: Level) -> Option<T> {
         match self {
             Ok(value) => Some(value),
             Err(err) => {
+                // Log the error message at the specified level
                 match level {
                     Level::TRACE => event!(Level::TRACE, "{}", err),
                     Level::DEBUG => event!(Level::DEBUG, "{}", err),
