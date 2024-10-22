@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 use std::hash::Hash;
+use std::mem;
 
 pub enum DiffItem<T> {
     Same(T),
@@ -9,14 +10,19 @@ pub enum DiffItem<T> {
 
 pub trait MoreHashSet<T>
 where
-    T: Eq + Hash + Clone
+    T: Eq + Hash + Clone,
 {
     fn diff(&self, y: &HashSet<T>) -> Vec<DiffItem<T>>;
+
+    fn drain_filter<F>(&mut self, predicate: F) -> HashSet<T>
+    where
+        F: FnMut(&T) -> bool,
+    ;
 }
 
 impl<T> MoreHashSet<T> for HashSet<T>
 where
-    T: Eq + Hash + Clone
+    T: Eq + Hash + Clone,
 {
     fn diff(&self, other: &HashSet<T>) -> Vec<DiffItem<T>> {
         self.intersection(other).cloned()
@@ -26,6 +32,28 @@ where
             ).chain(other.difference(self).cloned()
             .map(|item| DiffItem::Added(item)))
             .collect()
+    }
+
+    /// Drains elements from the `HashSet` for which `predicate` returns `true`.
+    /// Returns a new `HashSet` containing all elements removed.
+    fn drain_filter<F>(&mut self, mut predicate: F) -> HashSet<T>
+    where
+        F: FnMut(&T) -> bool,
+    {
+        // Use mem::replace to swap out the original set with an empty one
+        let original = mem::take(self);
+        let mut removed = HashSet::new();
+
+        // Move matching elements to removed, non-matching back to self
+        for item in original {
+            if predicate(&item) {
+                removed.insert(item);
+            } else {
+                self.insert(item);
+            }
+        }
+
+        removed
     }
 }
 
