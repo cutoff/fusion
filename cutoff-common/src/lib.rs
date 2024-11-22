@@ -10,7 +10,7 @@ use std::thread::JoinHandle;
 
 pub trait IntoOk
 where
-    Self: Sized
+    Self: Sized,
 {
     fn into_ok<E>(self) -> Result<Self, E>;
 }

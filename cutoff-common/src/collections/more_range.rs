@@ -2,14 +2,14 @@ use std::ops::RangeInclusive;
 
 pub trait MoreRangeInclusive<T>
 where
-    T: Copy + PartialOrd
+    T: Copy + PartialOrd,
 {
-    fn intersection(&self, range2: &RangeInclusive<T>) -> Option<RangeInclusive<T>>;    
+    fn intersection(&self, range2: &RangeInclusive<T>) -> Option<RangeInclusive<T>>;
 }
 
 impl<T> MoreRangeInclusive<T> for RangeInclusive<T>
 where
-    T: Copy + PartialOrd
+    T: Copy + PartialOrd,
 {
     fn intersection(&self, other: &RangeInclusive<T>) -> Option<RangeInclusive<T>> {
         let start = if self.start() > other.start() { *self.start() } else { *other.start() };
