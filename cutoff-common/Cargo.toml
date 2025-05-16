@@ -10,10 +10,10 @@ serde = ["dep:serde"]
 tracing-subscriber = ["dep:tracing-subscriber"]
 
 [dependencies]
-thiserror = "1.0.61"
-derive_builder = "0.20.0"
-tracing = "0.1.40"
-tracing-subscriber = { version = "0.3.18", optional = true }
-serde = { version = "1.0.203", optional = true }
-regex = "1.10.4"
-url = "2.5.0"
+thiserror = "2.0.12"
+derive_builder = "0.20.2"
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", optional = true }
+serde = { version = "1.0.219", optional = true }
+regex = "1.11.1"
+url = "2.5.4"
