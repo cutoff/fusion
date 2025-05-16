@@ -5,7 +5,7 @@ edition = "2021"
 authors = [ "mail@renauddenis.com" ]
 license = "MIT OR Apache-2.0"
 description = "A collection of common utilities and helpers used across Cutoff projects"
-publish = false
+repository = "https://github.com/CutoffAudio/common-rs"
 
 [features]
 serde = ["dep:serde"]
