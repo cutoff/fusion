@@ -152,4 +152,72 @@ mod tests {
         let count_removed2 = diff2.iter().filter(|item| matches!(item, DiffItem::Removed(_))).count();
         assert_eq!(count_added1, count_removed2);
     }
+
+    #[test]
+    fn test_drain_filter_all() {
+        let mut set = set_from_slice(&[1, 2, 3, 4, 5]);
+        let removed = set.drain_filter(|_| true);
+
+        // All elements should be removed
+        assert!(set.is_empty());
+        assert_eq!(removed.len(), 5);
+        assert!(removed.contains(&1));
+        assert!(removed.contains(&2));
+        assert!(removed.contains(&3));
+        assert!(removed.contains(&4));
+        assert!(removed.contains(&5));
+    }
+
+    #[test]
+    fn test_drain_filter_none() {
+        let mut set = set_from_slice(&[1, 2, 3, 4, 5]);
+        let original_set = set.clone();
+        let removed = set.drain_filter(|_| false);
+
+        // No elements should be removed
+        assert_eq!(set, original_set);
+        assert!(removed.is_empty());
+    }
+
+    #[test]
+    fn test_drain_filter_predicate() {
+        let mut set = set_from_slice(&[1, 2, 3, 4, 5]);
+        let removed = set.drain_filter(|&x| x % 2 == 0);
+
+        // Only even numbers should be removed
+        assert_eq!(set.len(), 3);
+        assert!(set.contains(&1));
+        assert!(set.contains(&3));
+        assert!(set.contains(&5));
+
+        assert_eq!(removed.len(), 2);
+        assert!(removed.contains(&2));
+        assert!(removed.contains(&4));
+    }
+
+    #[test]
+    fn test_drain_filter_empty_set() {
+        let mut set: HashSet<i32> = HashSet::new();
+        let removed = set.drain_filter(|_| true);
+
+        // Nothing should happen with an empty set
+        assert!(set.is_empty());
+        assert!(removed.is_empty());
+    }
+
+    #[test]
+    fn test_drain_filter_with_strings() {
+        let mut set = set_from_slice(&["apple", "banana", "cherry", "date", "elderberry"]);
+        let removed = set.drain_filter(|s| s.len() > 5);
+
+        // Only strings with length > 5 should be removed
+        assert_eq!(set.len(), 2);
+        assert!(set.contains("apple"));
+        assert!(set.contains("date"));
+
+        assert_eq!(removed.len(), 3);
+        assert!(removed.contains("banana"));
+        assert!(removed.contains("cherry"));
+        assert!(removed.contains("elderberry"));
+    }
 }

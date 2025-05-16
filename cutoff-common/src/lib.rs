@@ -39,3 +39,59 @@ where
 {
     thread::Builder::new().name(name.into()).spawn(f).unwrap()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::sync::mpsc;
+
+    #[test]
+    fn test_into_ok() {
+        let value = 42;
+        let result: Result<i32, &str> = value.into_ok();
+        assert_eq!(result, Ok(42));
+    }
+
+    #[test]
+    fn test_maybe_from() {
+        // Test a simple implementation of MaybeFrom
+        #[allow(non_local_definitions)]
+        impl MaybeFrom<i32> for Option<String> {
+            fn maybe_from(value: i32) -> Option<Self> {
+                if value > 0 {
+                    Some(Some(value.to_string()))
+                } else {
+                    None
+                }
+            }
+        }
+
+        // Test with a positive value
+        let result = Option::<String>::maybe_from(42);
+        assert_eq!(result, Some(Some("42".to_string())));
+
+        // Test with a non-positive value
+        let result = Option::<String>::maybe_from(0);
+        assert_eq!(result, None);
+    }
+
+    #[test]
+    fn test_thread_spawn() {
+        let (tx, rx) = mpsc::channel();
+
+        // Spawn a thread that sends a value
+        let handle = thread_spawn("test-thread", move || {
+            tx.send(42).unwrap();
+            "thread result"
+        });
+
+        // Verify the thread name
+        assert_eq!(handle.thread().name(), Some("test-thread"));
+
+        // Verify the thread executed the closure
+        assert_eq!(rx.recv().unwrap(), 42);
+
+        // Verify the thread returned the expected value
+        assert_eq!(handle.join().unwrap(), "thread result");
+    }
+}
