@@ -1,0 +1,10 @@
+# Log file
+*.log
+
+# Editor files
+.idea
+*.iml
+.run
+
+# Added by cargo
+target
