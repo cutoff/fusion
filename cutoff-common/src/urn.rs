@@ -1,3 +1,36 @@
+//! Utilities for working with Uniform Resource Names (URNs).
+//!
+//! This module provides a robust implementation of URNs according to RFC 8141.
+//! It includes functionality for parsing, building, comparing, and manipulating URNs.
+//!
+//! A URN is a URI that uses the "urn" scheme and is designed to be globally unique
+//! and persistent, even when the resource it identifies no longer exists or becomes
+//! unavailable.
+//!
+//! # Examples
+//!
+//! ```
+//! use cutoff_common::urn::Urn;
+//! use std::str::FromStr;
+//!
+//! // Parse a URN from a string
+//! let urn = Urn::from_str("urn:example:resource").unwrap();
+//! assert_eq!(urn.nid(), "example");
+//! assert_eq!(urn.nss(), "resource");
+//!
+//! // Build a URN using the builder pattern
+//! let urn = Urn::builder()
+//!     .nid("example")
+//!     .nss("resource")
+//!     .path("path")
+//!     .query("key=value")
+//!     .fragment("section")
+//!     .build()
+//!     .unwrap();
+//!
+//! assert_eq!(urn.to_string(), "urn:example:resource/path?key=value#section");
+//! ```
+
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 use std::sync::LazyLock;

@@ -1,23 +1,165 @@
+//! Extensions for the standard library's `HashSet` type.
+//!
+//! This module provides additional functionality for `HashSet` through the
+//! `MoreHashSet` trait, including methods for comparing sets and filtering elements.
+
 use std::collections::HashSet;
 use std::hash::Hash;
 use std::mem;
 
+/// Represents an item in the difference between two sets.
+///
+/// When comparing two sets, each element can be in one of three states:
+/// - Present in both sets (`Same`)
+/// - Present only in the second set (`Added`)
+/// - Present only in the first set (`Removed`)
+///
+/// This enum is used by the `diff` method to represent these states.
+///
+/// # Examples
+///
+/// ```
+/// use cutoff_common::collections::more_hashset::{MoreHashSet, DiffItem};
+/// use std::collections::HashSet;
+///
+/// let mut set1 = HashSet::new();
+/// set1.insert(1);
+/// set1.insert(2);
+///
+/// let mut set2 = HashSet::new();
+/// set2.insert(2);
+/// set2.insert(3);
+///
+/// let diff = set1.diff(&set2);
+/// // diff contains: DiffItem::Same(2), DiffItem::Removed(1), DiffItem::Added(3)
+/// ```
+#[derive(Debug, PartialEq, Eq)]
 pub enum DiffItem<T> {
+    /// The item is present in both sets.
     Same(T),
+    /// The item is present only in the second set.
     Added(T),
+    /// The item is present only in the first set.
     Removed(T),
 }
 
+/// Extension trait for `HashSet` providing additional functionality.
+///
+/// This trait extends the standard library's `HashSet` with methods for
+/// comparing sets and filtering elements.
+///
+/// # Type Parameters
+///
+/// * `T` - The type of elements in the set. Must implement `Eq`, `Hash`, and `Clone`.
+///
+/// # Examples
+///
+/// ```
+/// use cutoff_common::collections::more_hashset::MoreHashSet;
+/// use std::collections::HashSet;
+///
+/// let mut set = HashSet::new();
+/// set.insert(1);
+/// set.insert(2);
+/// set.insert(3);
+///
+/// // Use drain_filter to remove even numbers
+/// let removed = set.drain_filter(|&x| x % 2 == 0);
+///
+/// assert_eq!(set.len(), 2);
+/// assert!(set.contains(&1));
+/// assert!(set.contains(&3));
+///
+/// assert_eq!(removed.len(), 1);
+/// assert!(removed.contains(&2));
+/// ```
 pub trait MoreHashSet<T>
 where
     T: Eq + Hash + Clone,
 {
-    fn diff(&self, y: &HashSet<T>) -> Vec<DiffItem<T>>;
+    /// Compares two sets and returns a vector of `DiffItem`s representing the differences.
+    ///
+    /// This method identifies elements that are:
+    /// - Present in both sets (`Same`)
+    /// - Present only in the other set (`Added`)
+    /// - Present only in this set (`Removed`)
+    ///
+    /// # Parameters
+    ///
+    /// * `other` - The set to compare with.
+    ///
+    /// # Returns
+    ///
+    /// A vector of `DiffItem`s representing the differences between the sets.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use cutoff_common::collections::more_hashset::{MoreHashSet, DiffItem};
+    /// use std::collections::HashSet;
+    ///
+    /// let mut set1 = HashSet::new();
+    /// set1.insert(1);
+    /// set1.insert(2);
+    ///
+    /// let mut set2 = HashSet::new();
+    /// set2.insert(2);
+    /// set2.insert(3);
+    ///
+    /// let diff = set1.diff(&set2);
+    ///
+    /// // Count items by type
+    /// let same_count = diff.iter().filter(|item| matches!(item, DiffItem::Same(_))).count();
+    /// let added_count = diff.iter().filter(|item| matches!(item, DiffItem::Added(_))).count();
+    /// let removed_count = diff.iter().filter(|item| matches!(item, DiffItem::Removed(_))).count();
+    ///
+    /// assert_eq!(same_count, 1);    // 2 is in both sets
+    /// assert_eq!(added_count, 1);   // 3 is only in set2
+    /// assert_eq!(removed_count, 1); // 1 is only in set1
+    /// ```
+    fn diff(&self, other: &HashSet<T>) -> Vec<DiffItem<T>>;
 
+    /// Removes elements from the set that match a predicate and returns them as a new set.
+    ///
+    /// This method is similar to the standard library's `retain` method, but it returns
+    /// the removed elements as a new set.
+    ///
+    /// # Parameters
+    ///
+    /// * `predicate` - A function that returns `true` for elements that should be removed.
+    ///
+    /// # Returns
+    ///
+    /// A new `HashSet` containing all elements that were removed.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use cutoff_common::collections::more_hashset::MoreHashSet;
+    /// use std::collections::HashSet;
+    ///
+    /// let mut set = HashSet::new();
+    /// set.insert(1);
+    /// set.insert(2);
+    /// set.insert(3);
+    /// set.insert(4);
+    ///
+    /// // Remove all even numbers
+    /// let removed = set.drain_filter(|&x| x % 2 == 0);
+    ///
+    /// // Check the original set
+    /// assert_eq!(set.len(), 2);
+    /// assert!(set.contains(&1));
+    /// assert!(set.contains(&3));
+    ///
+    /// // Check the removed elements
+    /// assert_eq!(removed.len(), 2);
+    /// assert!(removed.contains(&2));
+    /// assert!(removed.contains(&4));
+    /// ```
     fn drain_filter<F>(&mut self, predicate: F) -> HashSet<T>
     where
-        F: FnMut(&T) -> bool,
-    ;
+        F: FnMut(&T) -> bool;
 }
 
 impl<T> MoreHashSet<T> for HashSet<T>
@@ -25,22 +167,25 @@ where
     T: Eq + Hash + Clone,
 {
     fn diff(&self, other: &HashSet<T>) -> Vec<DiffItem<T>> {
+        // Find elements that are in both sets
         self.intersection(other).cloned()
             .map(|item| DiffItem::Same(item))
+            // Find elements that are only in self
             .chain(self.difference(other).cloned()
                 .map(|item| DiffItem::Removed(item))
-            ).chain(other.difference(self).cloned()
-            .map(|item| DiffItem::Added(item)))
+            )
+            // Find elements that are only in other
+            .chain(other.difference(self).cloned()
+                .map(|item| DiffItem::Added(item))
+            )
             .collect()
     }
 
-    /// Drains elements from the `HashSet` for which `predicate` returns `true`.
-    /// Returns a new `HashSet` containing all elements removed.
     fn drain_filter<F>(&mut self, mut predicate: F) -> HashSet<T>
     where
         F: FnMut(&T) -> bool,
     {
-        // Use mem::replace to swap out the original set with an empty one
+        // Use mem::take to swap out the original set with an empty one
         let original = mem::take(self);
         let mut removed = HashSet::new();
 
