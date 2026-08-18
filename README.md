@@ -1,0 +1,26 @@
+# Cutoff Fusion
+
+**The public Rust stack for the Cutoff audio-software framework** — a cargo workspace of crates published
+to crates.io.
+
+> ⚠️ **Incubating** — early stage. APIs will change.
+
+## Crates
+
+| Crate | What |
+|---|---|
+| [`cutoff`](cutoff/) | Umbrella / root crate — the namespace anchor for the ecosystem. |
+
+More component crates (`cutoff-*`) land here as they mature.
+
+## Licensing
+
+Dual-licensed under the **Tylium Evolutive License Framework (TELF)**:
+
+- **Open source:** GNU **AGPL-3.0** — see [`LICENSE.md`](LICENSE.md).
+- **Commercial:** a commercial license lifts the AGPL obligations. Contact `legal@tylium.io`.
+
+The framework, CLA, and SLA are in [`license-telf/`](license-telf/). Contributions require the CLA — see
+[`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+A **Tylium** product — <https://cutoff.dev>.
