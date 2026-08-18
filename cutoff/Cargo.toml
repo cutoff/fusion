@@ -1,0 +1,14 @@
+[package]
+name        = "cutoff"
+version     = "0.1.0"
+description = "Umbrella / root crate for the Cutoff audio-software framework ecosystem (incubating)."
+readme      = "README.md"
+keywords    = ["audio", "midi", "dsp", "framework"]
+categories  = ["multimedia::audio"]
+
+edition.workspace      = true
+rust-version.workspace = true
+license.workspace      = true
+authors.workspace      = true
+repository.workspace   = true
+homepage.workspace     = true

@@ -1,0 +1,11 @@
+[workspace]
+resolver = "3"
+members  = ["cutoff"]
+
+[workspace.package]
+edition      = "2024"
+rust-version = "1.85"
+license      = "AGPL-3.0-only"
+authors      = ["Renaud Denis <mail@renauddenis.com>"]
+repository   = "https://github.com/cutoff/fusion"
+homepage     = "https://cutoff.dev"
