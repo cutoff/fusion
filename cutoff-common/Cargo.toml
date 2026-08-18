@@ -1,0 +1,21 @@
+[package]
+name = "cutoff-common"
+version = "0.9.1"
+edition = "2024"
+authors = ["mail@renauddenis.com"]
+license = "MIT OR Apache-2.0"
+description = "A collection of common utilities and helpers used across Cutoff projects"
+repository = "https://github.com/cutoff/common-rs"
+
+[features]
+serde = ["dep:serde"]
+tracing-subscriber = ["dep:tracing-subscriber"]
+
+[dependencies]
+thiserror = "2.0.12"
+derive_builder = "0.20.2"
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", optional = true }
+serde = { version = "1.0.219", optional = true }
+regex = "1.11.1"
+url = "2.5.4"
