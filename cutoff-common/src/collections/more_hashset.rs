@@ -168,15 +168,21 @@ where
 {
     fn diff(&self, other: &HashSet<T>) -> Vec<DiffItem<T>> {
         // Find elements that are in both sets
-        self.intersection(other).cloned()
+        self.intersection(other)
+            .cloned()
             .map(|item| DiffItem::Same(item))
             // Find elements that are only in self
-            .chain(self.difference(other).cloned()
-                .map(|item| DiffItem::Removed(item))
+            .chain(
+                self.difference(other)
+                    .cloned()
+                    .map(|item| DiffItem::Removed(item)),
             )
             // Find elements that are only in other
-            .chain(other.difference(self).cloned()
-                .map(|item| DiffItem::Added(item))
+            .chain(
+                other
+                    .difference(self)
+                    .cloned()
+                    .map(|item| DiffItem::Added(item)),
             )
             .collect()
     }
@@ -226,8 +232,18 @@ mod tests {
         let set2 = set_from_slice(&[4, 5, 6]);
         let diff = set1.diff(&set2);
         assert_eq!(diff.len(), 6);
-        assert_eq!(diff.iter().filter(|item| matches!(item, DiffItem::Removed(_))).count(), 3);
-        assert_eq!(diff.iter().filter(|item| matches!(item, DiffItem::Added(_))).count(), 3);
+        assert_eq!(
+            diff.iter()
+                .filter(|item| matches!(item, DiffItem::Removed(_)))
+                .count(),
+            3
+        );
+        assert_eq!(
+            diff.iter()
+                .filter(|item| matches!(item, DiffItem::Added(_)))
+                .count(),
+            3
+        );
     }
 
     #[test]
@@ -236,9 +252,24 @@ mod tests {
         let set2 = set_from_slice(&[3, 4, 5, 6]);
         let diff = set1.diff(&set2);
         assert_eq!(diff.len(), 6);
-        assert_eq!(diff.iter().filter(|item| matches!(item, DiffItem::Same(_))).count(), 2);
-        assert_eq!(diff.iter().filter(|item| matches!(item, DiffItem::Removed(_))).count(), 2);
-        assert_eq!(diff.iter().filter(|item| matches!(item, DiffItem::Added(_))).count(), 2);
+        assert_eq!(
+            diff.iter()
+                .filter(|item| matches!(item, DiffItem::Same(_)))
+                .count(),
+            2
+        );
+        assert_eq!(
+            diff.iter()
+                .filter(|item| matches!(item, DiffItem::Removed(_)))
+                .count(),
+            2
+        );
+        assert_eq!(
+            diff.iter()
+                .filter(|item| matches!(item, DiffItem::Added(_)))
+                .count(),
+            2
+        );
     }
 
     #[test]
@@ -247,9 +278,24 @@ mod tests {
         let set2 = set_from_slice(&[2, 3, 4]);
         let diff = set1.diff(&set2);
         assert_eq!(diff.len(), 5);
-        assert_eq!(diff.iter().filter(|item| matches!(item, DiffItem::Same(_))).count(), 3);
-        assert_eq!(diff.iter().filter(|item| matches!(item, DiffItem::Removed(_))).count(), 2);
-        assert_eq!(diff.iter().filter(|item| matches!(item, DiffItem::Added(_))).count(), 0);
+        assert_eq!(
+            diff.iter()
+                .filter(|item| matches!(item, DiffItem::Same(_)))
+                .count(),
+            3
+        );
+        assert_eq!(
+            diff.iter()
+                .filter(|item| matches!(item, DiffItem::Removed(_)))
+                .count(),
+            2
+        );
+        assert_eq!(
+            diff.iter()
+                .filter(|item| matches!(item, DiffItem::Added(_)))
+                .count(),
+            0
+        );
     }
 
     #[test]
@@ -271,9 +317,24 @@ mod tests {
         let set2 = set_from_slice(&["banana", "cherry", "date"]);
         let diff = set1.diff(&set2);
         assert_eq!(diff.len(), 4);
-        assert_eq!(diff.iter().filter(|item| matches!(item, DiffItem::Same(_))).count(), 2);
-        assert_eq!(diff.iter().filter(|item| matches!(item, DiffItem::Removed(_))).count(), 1);
-        assert_eq!(diff.iter().filter(|item| matches!(item, DiffItem::Added(_))).count(), 1);
+        assert_eq!(
+            diff.iter()
+                .filter(|item| matches!(item, DiffItem::Same(_)))
+                .count(),
+            2
+        );
+        assert_eq!(
+            diff.iter()
+                .filter(|item| matches!(item, DiffItem::Removed(_)))
+                .count(),
+            1
+        );
+        assert_eq!(
+            diff.iter()
+                .filter(|item| matches!(item, DiffItem::Added(_)))
+                .count(),
+            1
+        );
     }
 
     #[test]
@@ -285,16 +346,34 @@ mod tests {
 
         assert_eq!(diff1.len(), diff2.len());
 
-        let count_same1 = diff1.iter().filter(|item| matches!(item, DiffItem::Same(_))).count();
-        let count_same2 = diff2.iter().filter(|item| matches!(item, DiffItem::Same(_))).count();
+        let count_same1 = diff1
+            .iter()
+            .filter(|item| matches!(item, DiffItem::Same(_)))
+            .count();
+        let count_same2 = diff2
+            .iter()
+            .filter(|item| matches!(item, DiffItem::Same(_)))
+            .count();
         assert_eq!(count_same1, count_same2);
 
-        let count_removed1 = diff1.iter().filter(|item| matches!(item, DiffItem::Removed(_))).count();
-        let count_added2 = diff2.iter().filter(|item| matches!(item, DiffItem::Added(_))).count();
+        let count_removed1 = diff1
+            .iter()
+            .filter(|item| matches!(item, DiffItem::Removed(_)))
+            .count();
+        let count_added2 = diff2
+            .iter()
+            .filter(|item| matches!(item, DiffItem::Added(_)))
+            .count();
         assert_eq!(count_removed1, count_added2);
 
-        let count_added1 = diff1.iter().filter(|item| matches!(item, DiffItem::Added(_))).count();
-        let count_removed2 = diff2.iter().filter(|item| matches!(item, DiffItem::Removed(_))).count();
+        let count_added1 = diff1
+            .iter()
+            .filter(|item| matches!(item, DiffItem::Added(_)))
+            .count();
+        let count_removed2 = diff2
+            .iter()
+            .filter(|item| matches!(item, DiffItem::Removed(_)))
+            .count();
         assert_eq!(count_added1, count_removed2);
     }
 

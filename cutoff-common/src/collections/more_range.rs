@@ -80,9 +80,17 @@ where
 {
     fn intersection(&self, other: &RangeInclusive<T>) -> Option<RangeInclusive<T>> {
         // Find the maximum of the start values
-        let start = if self.start() > other.start() { *self.start() } else { *other.start() };
+        let start = if self.start() > other.start() {
+            *self.start()
+        } else {
+            *other.start()
+        };
         // Find the minimum of the end values
-        let end = if self.end() < other.end() { *self.end() } else { *other.end() };
+        let end = if self.end() < other.end() {
+            *self.end()
+        } else {
+            *other.end()
+        };
 
         // If start <= end, the ranges overlap
         if start <= end {

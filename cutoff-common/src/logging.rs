@@ -29,7 +29,7 @@
 //! ```
 
 use std::fmt::Display;
-use tracing::{event, Level};
+use tracing::{Level, event};
 
 /// A trait for converting a `Result` into an `Option` while logging any errors.
 ///

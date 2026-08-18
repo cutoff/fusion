@@ -15,9 +15,9 @@
 //! - Optional logging utilities (with the `tracing-subscriber` feature)
 //! - Optional serialization support (with the `serde` feature)
 
-pub mod urn;
 pub mod collections;
 pub mod io;
+pub mod urn;
 
 #[cfg(feature = "tracing-subscriber")]
 pub mod logging;

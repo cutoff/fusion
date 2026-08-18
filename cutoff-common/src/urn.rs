@@ -79,19 +79,29 @@ impl Urn {
     }
 
     /// Returns the Namespace Identifier (NID) of the URN.
-    pub fn nid(&self) -> &str { &self.nid }
+    pub fn nid(&self) -> &str {
+        &self.nid
+    }
 
     /// Returns the Namespace Specific String (NSS) of the URN.
-    pub fn nss(&self) -> &str { &self.nss }
+    pub fn nss(&self) -> &str {
+        &self.nss
+    }
 
     /// Returns the optional path component of the URN, if present.
-    pub fn path(&self) -> Option<&str> { self.path.as_deref() }
+    pub fn path(&self) -> Option<&str> {
+        self.path.as_deref()
+    }
 
     /// Returns the optional query component of the URN, if present.
-    pub fn query(&self) -> Option<&str> { self.query.as_deref() }
+    pub fn query(&self) -> Option<&str> {
+        self.query.as_deref()
+    }
 
     /// Returns the optional fragment component of the URN, if present.
-    pub fn fragment(&self) -> Option<&str> { self.fragment.as_deref() }
+    pub fn fragment(&self) -> Option<&str> {
+        self.fragment.as_deref()
+    }
 
     /// Checks if the URN is valid according to RFC 8141.
     pub fn is_valid(&self) -> bool {
@@ -107,11 +117,11 @@ impl Urn {
 
     /// Compares two URNs for equality, ignoring case sensitivity in the scheme and namespace identifier.
     pub fn equals(&self, other: &Self) -> bool {
-        self.nid.to_lowercase() == other.nid.to_lowercase() &&
-            self.nss == other.nss &&
-            self.path == other.path &&
-            self.query == other.query &&
-            self.fragment == other.fragment
+        self.nid.to_lowercase() == other.nid.to_lowercase()
+            && self.nss == other.nss
+            && self.path == other.path
+            && self.query == other.query
+            && self.fragment == other.fragment
     }
 
     /// Normalizes the URN by converting the scheme and namespace identifier to lowercase.
@@ -152,7 +162,6 @@ impl Urn {
         self.with_query(None)
     }
 
-
     /// Creates a new URN without the fragment component.
     pub fn without_fragment(&self) -> Self {
         self.with_fragment(None)
@@ -172,9 +181,9 @@ impl Urn {
         let norm_self = self.normalize();
         let norm_other = other.normalize();
 
-        norm_self.nid == norm_other.nid &&
-            norm_self.nss == norm_other.nss &&
-            norm_self.path == norm_other.path
+        norm_self.nid == norm_other.nid
+            && norm_self.nss == norm_other.nss
+            && norm_self.path == norm_other.path
         // Note: query and fragment are not considered for lexical equivalence
     }
 }
@@ -188,8 +197,7 @@ impl FromStr for Urn {
             return Err(UrnFormatError::UrnSchemeExpected);
         }
 
-        let url = Url::parse(urn_string)
-            .map_err(|_| UrnFormatError::InvalidUrn)?;
+        let url = Url::parse(urn_string).map_err(|_| UrnFormatError::InvalidUrn)?;
 
         if let Some(captures) = URN_PATTERN.captures(url.path()) {
             let urn = Urn {
@@ -260,8 +268,7 @@ mod serde {
             D: Deserializer<'de>,
         {
             let s = String::deserialize(deserializer)?;
-            Urn::from_str(&s)
-                .map_err(serde::de::Error::custom)
+            Urn::from_str(&s).map_err(serde::de::Error::custom)
         }
     }
 }
@@ -296,7 +303,8 @@ mod tests {
             .path("hello")
             .query("foo=bar&flip=flop")
             .fragment("world")
-            .build().unwrap();
+            .build()
+            .unwrap();
 
         assert_eq!(
             "urn:some_nid:foo.bar/hello?foo=bar&flip=flop#world",
@@ -372,7 +380,10 @@ mod tests {
             .build()
             .unwrap();
 
-        assert_eq!(urn.to_string(), "urn:example:resource/path?key=value#section");
+        assert_eq!(
+            urn.to_string(),
+            "urn:example:resource/path?key=value#section"
+        );
     }
 
     #[test]
