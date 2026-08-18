@@ -1,11 +1,15 @@
 [package]
-name = "cutoff-common"
-version = "0.9.1"
-edition = "2024"
-authors = ["mail@renauddenis.com"]
-license = "MIT OR Apache-2.0"
+name        = "cutoff-common"
+version     = "0.9.2"
 description = "A collection of common utilities and helpers used across Cutoff projects"
-repository = "https://github.com/cutoff/common-rs"
+readme      = "README.md"
+license     = "MIT OR Apache-2.0"
+
+edition.workspace      = true
+rust-version.workspace = true
+authors.workspace      = true
+repository.workspace   = true
+homepage.workspace     = true
 
 [features]
 serde = ["dep:serde"]

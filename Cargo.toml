@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members  = ["cutoff"]
+members  = ["cutoff", "cutoff-common"]
 
 [workspace.package]
 edition      = "2024"
