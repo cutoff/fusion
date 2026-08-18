@@ -1,0 +1,35 @@
+name: Publish
+
+# Mirrors the AudioUI "publish on main" discipline, adapted to Rust: pushing a new
+# crate version to `main` publishes it. Already-published versions are skipped.
+on:
+  push:
+    branches: [main]
+
+# crates.io Trusted Publishing (OIDC) — no long-lived token stored in the repo.
+# One-time setup: configure the trusted publisher for each crate on crates.io.
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: rust-lang/crates-io-auth-action@v1
+        id: auth
+      - name: Publish workspace members (skip already-published versions)
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+        run: |
+          set -o pipefail
+          for crate in cutoff; do
+            out=$(cargo publish -p "$crate" 2>&1) && { echo "$out"; continue; }
+            if echo "$out" | grep -qiE 'already (uploaded|exists)'; then
+              echo "$crate: version already published, skipping"
+            else
+              echo "$out"; exit 1
+            fi
+          done
